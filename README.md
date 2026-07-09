@@ -7,7 +7,7 @@ Log a meal by taking a photo. A local vision model identifies the food items and
 - Photo-based meal logging: a local vision model (`llava`) identifies food items and estimates serving size directly from an image
 - Nutrition facts (calories, protein, carbs, fat) come from the USDA FoodData Central API, scaled to the estimated serving size
 - Daily calorie/macro goals, tracked against today's logged totals
-- AI-generated coaching recommendations based on how today's totals compare to the goal
+- Coaching recommendations based on how today's totals compare to the goal
 - REST API with API-key auth on write endpoints
 - Streamlit UI: upload a photo, see the identified items, track progress, get a recommendation
 - Runs entirely locally (Ollama) except for the USDA lookup — no LLM API costs
