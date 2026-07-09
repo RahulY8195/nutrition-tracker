@@ -40,8 +40,8 @@ Python, FastAPI, PostgreSQL, Ollama (local vision + text models), USDA FoodData 
 
 ## Setup
 
-1. (Optional) Get a free USDA FoodData Central API key at https://fdc.nal.usda.gov/api-key-signup — the app works without one using USDA's shared `DEMO_KEY`, but that key is rate-limited.
-2. Copy `.env.example` to `.env` and fill in `USDA_API_KEY` if you got one.
+1. Get a free USDA FoodData Central API key at https://fdc.nal.usda.gov/api-key-signup — the shared `DEMO_KEY` is rate-limited across all users and will not work reliably.
+2. Copy `.env.example` to `.env` and set `USDA_API_KEY`.
 3. Start everything:
    ```bash
    docker compose up -d --build
