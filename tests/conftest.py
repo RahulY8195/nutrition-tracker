@@ -1,0 +1,64 @@
+import os
+
+os.environ.setdefault(
+    "DATABASE_URL", "postgresql://nutritionuser:nutritionpass@localhost:5433/nutritiondb"
+)
+
+import pytest
+from sqlalchemy import create_engine, text
+
+DATABASE_URL = os.environ["DATABASE_URL"]
+
+
+def postgres_available() -> bool:
+    try:
+        engine = create_engine(DATABASE_URL, connect_args={"connect_timeout": 2})
+        with engine.connect() as conn:
+            conn.execute(text("SELECT 1"))
+        engine.dispose()
+        return True
+    except Exception:
+        return False
+
+
+POSTGRES_AVAILABLE = postgres_available()
+
+
+@pytest.fixture(scope="session")
+def _app():
+    from app.database import Base, engine
+    from app.main import app
+
+    Base.metadata.create_all(bind=engine)
+    return app
+
+
+@pytest.fixture()
+def db_session(_app):
+    from sqlalchemy.orm import sessionmaker
+
+    from app.database import engine
+
+    with engine.connect() as conn:
+        conn.execute(text("TRUNCATE food_items, meals, goals, recommendations RESTART IDENTITY CASCADE"))
+        conn.commit()
+
+    return sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+
+@pytest.fixture()
+def client(_app, db_session):
+    from fastapi.testclient import TestClient
+
+    from app.database import get_db
+
+    def override_get_db():
+        db = db_session()
+        try:
+            yield db
+        finally:
+            db.close()
+
+    _app.dependency_overrides[get_db] = override_get_db
+    yield TestClient(_app)
+    _app.dependency_overrides.clear()
